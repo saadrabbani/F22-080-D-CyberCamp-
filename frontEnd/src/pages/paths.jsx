@@ -1,12 +1,9 @@
-import React from "react";
 import { useEffect, useState } from "react";
 import axios from "../api/api";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../sessions/cookies";
 import { isAuthenticated, setPathId } from "../sessions/auth";
 import StudentNavBar from "../componrnts/navs/NavStudent";
-
-import Footer from "../componrnts/footer/footer";
 
 const Paths = () => {
   const [paths, setPaths] = useState([]);
@@ -56,43 +53,40 @@ const Paths = () => {
   return (
     <>
       <StudentNavBar />
-      <div className="body">
-        <div className="centered text-white">
-          <h1>Paths</h1>
+      <div className="p-3 mb-2 bg-dark text-white">
+        <div className="col-lg">
+          <br />
+          <br />
+          <h1> All Paths </h1>
+          {isError !== "" && <h2>{isError}</h2>}
+          {/* {isError !== "" && <h2> Shamshad</h2>} */}
         </div>
-        <div className="grid-container">
-          {paths.map((path) => (
-            <div key={path._id}>
-              {/* <div className="accordion" id="accordionExample"> */}
-              <div
-                className="card "
-                style={{
-                  width: "30rem",
-                }}
-              >
-                <div className="card-Container">
-                  <h4 className="card-header " style={{ color: "#16df70" }}>
-                    {path.pathName}
-                  </h4>
-                  <p className="card-text">
-                    {path.description.length > 250
-                      ? path.description.substring(0, 250) + "..."
-                      : path.description}
-                  </p>
-                  <button
-                    className="button"
-                    onClick={() => handleExploreClick(path._id)}
-                  >
-                    Explore
-                  </button>
+        <div ClassName="container">
+          <div className="row g-2 align-items-center ">
+            {paths.map((path) => (
+              <div key={path._id}>
+                {/* //   <div className="row d-flex"> */}
+                <div
+                  className="card bg-transparent border m-2 bh-blurred "
+                  style={{ width: "18rem" }}
+                >
+                  <div className="card-body ">
+                    <h5 className="card-title">{path.pathName}</h5>
+                    <p className="card-text">{path.description}</p>
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => handleExploreClick(path._id)}
+                    >
+                      Explore
+                    </button>
+                    {/* </div> */}
+                  </div>
                 </div>
               </div>
-              {/* </div> */}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 };

@@ -1,4 +1,3 @@
-import React from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../sessions/auth";
@@ -18,11 +17,7 @@ const Logout = () => {
     logoutUser();
   }, []);
 
-  return (
-    <>
-      <div></div>
-    </>
-  );
+  return <></>;
 };
 
 export default Logout;

@@ -1,4 +1,3 @@
-import React from "react";
 import { useState, useEffect } from "react";
 import axios from "../api/api";
 import { useNavigate } from "react-router-dom";
@@ -7,8 +6,6 @@ import { isAuthenticated, getPathId } from "../sessions/auth";
 import { setLocalStorage } from "../localSrorage/localStorage";
 
 import StudentNavBar from "../componrnts/navs/NavStudent";
-
-import Footer from "../componrnts/footer/footer";
 
 const Courses = () => {
   const [courses, setcourses] = useState([]);
@@ -23,8 +20,8 @@ const Courses = () => {
       alert("Pleasr subscribe to enjoy the course");
     } else {
       console.log(isAuthenticated().subscriber);
-      setLocalStorage("courseID", course._id);
-      navigate("/coursePage");
+      setLocalStorage("course", course);
+      navigate(`/coursePage/`);
     }
   };
 
@@ -33,24 +30,37 @@ const Courses = () => {
   // using Async Await
   const getAllCourses = async () => {
     try {
-      const Pid = getPathId();
-      console.log("Path Id : ", Pid);
+      const pathId = getPathId();
       const authToken = getCookie("token");
       if (!isAuthenticated() || isAuthenticated().userType !== "student") {
-        navigate("/login");
+        // const authToken = Cookies.get("loginToken");
+        // console.log("Auth Token : ", authToken);
+        // const loginToken = response.headers["loginToken"];
+        // console.log("Login Token : ", loginToken);
       }
 
       const response = await axios
-        // http://localhost:8000/api/findCourseByPathId
-        .get("http://localhost:8000/api/findCourseByPathId", {
-          params: {
-            pathId: Pid,
+        // .get("http://localhost:8000/api/getAllCourses", {
+        .get(
+          "http://localhost:8000/api/findCourseByPathId",
+          {
+            params: {
+              pathId: pathId,
+            },
           },
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: authToken,
+          {
+            // findCourseByPathId/${pathId
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: authToken,
+            },
           },
-        })
+          [
+            {
+              pathId: pathId,
+            },
+          ]
+        )
         .then((res) => {
           console.log(res.data);
           setcourses(res.data);
@@ -74,41 +84,63 @@ const Courses = () => {
   return (
     <>
       <StudentNavBar />
-      <div className="body">
-        <div className="centered text-white">
+      <div className="p-3 mb-2 bg-dark text-white">
+        <div className="col-lg">
+          <br />
+          <br />
           <h1> All courses </h1>
           {isError !== "" && <h2>{isError}</h2>}
           {/* {isError !== "" && <h2> Shamshad</h2>} */}
         </div>
-        <div>
-          {courses.length === 0 && (
-            <h2 style={{ color: "red" }}> No course in this PATH </h2>
-          )}
-        </div>
-        <div className="grid-container">
-          {courses.map((course) => (
-            <div className="card" style={{ width: "40rem" }}>
-              <div className="card-Container">
-                <h2 className="card-title" style={{ color: "" }}>
-                  {course.title}
-                </h2>
-                <p className="card-text overflow-text">{course.description}</p>
-                {/* <p className="card-text">{course.duration}</p> */}
-                <p className="card-text">by : {course.creatorName}</p>
-                {/* <p className="card-text">{course.pathId}</p> */}
-                <button
-                  href="#"
-                  className="button"
-                  onClick={() => handleExploreClick(course)}
-                >
-                  go to Course
-                </button>
+        <div ClassName="container">
+          <div className="row g-2 align-items-center ">
+            {/* {courses.map((courses) => (
+              // check if coursePathId is equal to pathId
+
+              //   <div className="row d-flex">
+              <div
+                className="card bg-transparent border m-2 bh-blurred "
+                style={{ width: "18rem" }}
+              >
+                <div className="card-body ">
+                  <h2 className="card-title">{courses.title}</h2>
+                  <p className="card-text">{courses.description}</p>
+                  <p className="card-text">{courses.duration}</p>
+                  <p className="card-text">{courses.creatorName}</p>
+                  <p className="card-text">{courses.pathId}</p>
+                  <a href="#" className="btn btn-primary">
+                    Explore
+                  </a>
+                </div>
               </div>
-            </div>
-          ))}
+            ))} */}
+            {courses.map((course) => (
+              // check if coursePathId is equal to pathId
+
+              //   <div className="row d-flex">+
+              <div
+                className="card bg-transparent border m-2 bh-blurred "
+                style={{ width: "18rem" }}
+              >
+                <div className="card-body ">
+                  <h2 className="card-title">{course.title}</h2>
+                  <p className="card-text">{course.description}</p>
+                  <p className="card-text">{course.duration}</p>
+                  <p className="card-text">{course.creatorName}</p>
+                  <p className="card-text">{course.pathId}</p>
+                  <a
+                    href="#"
+                    className="btn btn-primary"
+                    onClick={() => handleExploreClick(course)}
+                  >
+                    go to Course
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 };

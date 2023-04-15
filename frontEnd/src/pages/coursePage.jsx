@@ -1,94 +1,102 @@
-// import "bootstrap/dist/css/bootstrap.min.css";
-import React from "react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 import { getLocalStorage } from "../localSrorage/localStorage";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+
 import StudentNavBar from "../componrnts/navs/NavStudent";
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { getCookie } from "../sessions/cookies";
-import { isAuthenticated } from "../sessions/auth";
-import VideoPlayer from "./Video/videoPlayer";
-import Footer from "../componrnts/footer/footer";
-import LaunchEC2Instance from "./awsLaunchInstance";
+
 const CoursePage = () => {
-  const src =
-    "http://141.145.196.28:8000/eLearnSecurity%20_%20My%20Certifications%20-%20Google%20Chrome%202022-12-15%2020-28-56.mp4";
-  const [course, setCourse] = useState("");
-  const courseID = getLocalStorage("courseID");
-  const navigate = useNavigate();
+  const course = getLocalStorage("course");
+  console.log("Course : ", course);
+  const [currentLecture, setCurrentLecture] = useState(course.lectures[0]);
+  console.log("Current Lecture : ", currentLecture);
 
-  const getCourse = async () => {
-    try {
-      const authToken = getCookie("token");
-      if (!isAuthenticated() || isAuthenticated().userType !== "student") {
-        navigate("/login");
-      }
-
-      const response = await axios.get(
-        `http://localhost:8000/api/findCourseById/${courseID}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: authToken,
-          },
-        }
-      );
-      console.log(response.data);
-      setCourse(response.data);
-    } catch (error) {
-      alert("Api is not being executed ");
-      console.log(error.message);
-    }
+  const handleLectureClick = (lecture) => {
+    setCurrentLecture(lecture);
   };
-
-  useEffect(() => {
-    getCourse();
-  }, []);
-
   return (
     <>
       <StudentNavBar />
-      <div className="page">
-        <div className="container">
-          {!course ? (
-            <div>
-              <h1>No Course Details</h1>
+      <Container>
+        {/* <Row>
+          <Col>1 of 2</Col>
+          <Col>2 of 2</Col>
+        </Row> */}
+        <Row xs={1} md={2}>
+          <Col>
+            <h2 className="course-title">
+              {" "}
+              <span>COURSE :___ </span>
+              {course.title}
+            </h2>
+            <div className="video-frame">
+              {
+                <iframe
+                  width="560"
+                  height="315"
+                  src={currentLecture}
+                  title="YouTube video player"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                ></iframe>
+              }
             </div>
-          ) : (
-            <div className="row">
-              <div className="">
-                <h1 style={{ color: "#16df70" }}>{course.title}</h1>
-                <p>{course.description}</p>
-              </div>
-              {/* <VideoPlayer videoId="6437f6e01cf92a0d2b4fa72a" /> */}
-              <video controls width="100%">
-                <source src={src} type="video/mp4" />
-                Sorry, your browser doesn't support embedded videos.
-              </video>
+            <h4 className="duration">Duration: {course.duration}</h4>
+          </Col>
+          <Col>
+            <div className="lectures-column">
+              <h4 className="lectures-title">Lectures:</h4>
+            </div>
+            <div className="lectures-list">
+              {course.lectures.map((lecture) => (
+                <button
+                  key={lecture}
+                  onClick={() => handleLectureClick(lecture)}
+                  className="lecture-link"
+                >
+                  {lecture}
+                </button>
+              ))}
+            </div>
+          </Col>
 
-              <div className="">
-                <ul>
-                  {course.lectures.map((lecture) => {
-                    return (
-                      <a>
-                        <li>{lecture.title}</li>
-                      </a>
-                    );
-                  })}
-                </ul>
-              </div>
-              {/* <h1>{course.pathId}</h1> */}
-            </div>
-          )}
+          <p className="course-description">{course.description}</p>
+        </Row>
+        <div className="reading-materials-column">
+          <h4 className="reading-materials-title">Reading Materials:</h4>
+          <div className="reading-materials-list">
+            {course.readingMaterials.map((material) => (
+              <a key={material} className="reading-material-link">
+                {material}
+              </a>
+            ))}
+          </div>
         </div>
-        <button
-          className="button"
-          onClick={() => navigate("/launchEC2Instance")}
-        >
-          Go to Labs
-        </button>
-      </div>
-      <Footer />
+        <div className="assignments-column">
+          <h4 className="assignments-title">Assignments:</h4>
+          <div className="assignments-list">
+            {course.assignments.map((assignment) => (
+              <a key={assignment} href={assignment} className="assignment-link">
+                {assignment}
+              </a>
+            ))}
+          </div>
+        </div>
+        <div className="quizzes-column">
+          <h4 className="quizzes-title">Quizzes:</h4>
+          <div className="quizzes-list">
+            {course.quizzes.map((quiz) => (
+              <Link key={quiz} to={quiz} className="quiz-link">
+                {quiz}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </Container>
     </>
   );
 };
